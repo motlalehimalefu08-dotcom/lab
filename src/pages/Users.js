@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+
+import { useState } from "react";
 import UserForm from "../components/UserForm";
 import UserList from "../components/UserList";
+import {
+    addUser,
+    updateUser as updateUserAPI,
+    deleteUser as deleteUserAPI
+} from "../Api";
 
 function Users({
     users,
@@ -13,10 +19,10 @@ function Users({
     const [membershipId, setMembershipId] = useState("");
     const [role, setRole] = useState("");
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
 
-        if (!name || !membershipId || !role) {
+        if (!name.trim() || !membershipId.trim() || !role) {
             alert("Please fill in all fields.");
             return;
         }
@@ -33,20 +39,30 @@ function Users({
         }
 
         const newUser = {
-            id: Date.now(),
             name: name.trim(),
             membershipId: membershipId.trim(),
             role
         };
 
-        setUsers([...users, newUser]);
+        try {
+            const savedUser = await addUser(newUser);
 
-        setName("");
-        setMembershipId("");
-        setRole("");
+            setUsers(previousUsers => [
+                ...previousUsers,
+                savedUser
+            ]);
+
+            setName("");
+            setMembershipId("");
+            setRole("");
+
+            alert("User added successfully.");
+        } catch (error) {
+            alert(error.message || "Failed to add user.");
+        }
     }
 
-    function updateUser(id) {
+    async function updateUser(id) {
         const user = users.find(item => item.id === id);
 
         if (!user) return;
@@ -69,6 +85,14 @@ function Users({
 
         if (newRole === null) return;
 
+        if (
+            !newName.trim() ||
+            !newMembershipId.trim()
+        ) {
+            alert("Name and Membership ID cannot be empty.");
+            return;
+        }
+
         if (newRole !== "Librarian" && newRole !== "User") {
             alert("Role must be Librarian or User.");
             return;
@@ -77,7 +101,7 @@ function Users({
         if (
             users.some(
                 item =>
-                    item.id !== id &&
+                    String(item.id) !== String(id) &&
                     item.membershipId.toLowerCase() ===
                         newMembershipId.trim().toLowerCase()
             )
@@ -87,32 +111,46 @@ function Users({
         }
 
         const updatedUser = {
-            ...user,
             name: newName.trim(),
             membershipId: newMembershipId.trim(),
             role: newRole
         };
 
-        setUsers(
-            users.map(item =>
-                item.id === id ? updatedUser : item
-            )
-        );
+        try {
+            const savedUser = await updateUserAPI(id, updatedUser);
 
-        if (user.id === loggedInUser.id) {
-            updateLoggedInUser(updatedUser);
+            setUsers(previousUsers =>
+                previousUsers.map(item =>
+                    String(item.id) === String(id)
+                        ? { ...item, ...savedUser }
+                        : item
+                )
+            );
+
+            if (String(user.id) === String(loggedInUser.id)) {
+                updateLoggedInUser({
+                    ...user,
+                    ...savedUser
+                });
+            }
+
+            alert("User updated successfully.");
+        } catch (error) {
+            alert(error.message || "Failed to update user.");
         }
     }
 
-    function deleteUser(id) {
-        if (id === loggedInUser.id) {
-            alert("You cannot delete the currently logged-in Librarian.");
+    async function deleteUser(id) {
+        if (String(id) === String(loggedInUser.id)) {
+            alert(
+                "You cannot delete the currently logged-in user."
+            );
             return;
         }
 
         const activeBorrow = transactions.some(
             transaction =>
-                transaction.userId === id &&
+                String(transaction.userId) === String(id) &&
                 transaction.type === "borrow" &&
                 transaction.status === "Borrowed"
         );
@@ -124,8 +162,22 @@ function Users({
             return;
         }
 
-        if (window.confirm("Are you sure you want to delete this user?")) {
-            setUsers(users.filter(user => user.id !== id));
+        if (!window.confirm("Are you sure you want to delete this user?")) {
+            return;
+        }
+
+        try {
+            await deleteUserAPI(id);
+
+            setUsers(previousUsers =>
+                previousUsers.filter(
+                    user => String(user.id) !== String(id)
+                )
+            );
+
+            alert("User deleted successfully.");
+        } catch (error) {
+            alert(error.message || "Failed to delete user.");
         }
     }
 

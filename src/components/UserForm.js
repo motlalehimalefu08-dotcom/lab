@@ -1,4 +1,3 @@
-import React from "react";
 
 function UserForm({
     name,
@@ -15,35 +14,43 @@ function UserForm({
 
             <form onSubmit={handleSubmit} className="form-grid">
                 <div className="form-group">
-                    <label>Name</label>
+                    <label htmlFor="userName">Name</label>
 
                     <input
+                        id="userName"
                         type="text"
                         placeholder="Enter full name"
                         value={name}
                         onChange={e => setName(e.target.value)}
+                        required
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Membership ID</label>
+                    <label htmlFor="membershipId">
+                        Membership ID
+                    </label>
 
                     <input
+                        id="membershipId"
                         type="text"
                         placeholder="Enter Membership ID"
                         value={membershipId}
                         onChange={e =>
                             setMembershipId(e.target.value)
                         }
+                        required
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Role</label>
+                    <label htmlFor="userRole">Role</label>
 
                     <select
+                        id="userRole"
                         value={role}
                         onChange={e => setRole(e.target.value)}
+                        required
                     >
                         <option value="">
                             Select Role

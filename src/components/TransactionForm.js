@@ -1,5 +1,3 @@
-import React from "react";
-
 function TransactionForm({
     isLibrarian,
     books,
@@ -11,23 +9,29 @@ function TransactionForm({
     transactionQuantity,
     setTransactionQuantity,
     activeBorrow,
-    onSubmit
+    onSubmit,
+    processing
 }) {
+    const displayedBooks = isLibrarian ? books : availableBooks;
+
     return (
         <div className="form-panel">
             <h2>Record Transaction</h2>
 
             <form onSubmit={onSubmit} className="form-grid">
                 <div className="form-group">
-                    <label>Book</label>
+                    <label htmlFor="transactionBook">Book</label>
 
                     <select
+                        id="transactionBook"
                         value={transactionBook}
                         onChange={e => setTransactionBook(e.target.value)}
+                        required
+                        disabled={processing}
                     >
                         <option value="">Select Book</option>
 
-                        {(isLibrarian ? books : availableBooks).map(book => (
+                        {displayedBooks.map(book => (
                             <option key={book.id} value={book.id}>
                                 {book.title} ({book.quantity} available)
                             </option>
@@ -36,11 +40,16 @@ function TransactionForm({
                 </div>
 
                 <div className="form-group">
-                    <label>Transaction Type</label>
+                    <label htmlFor="transactionType">
+                        Transaction Type
+                    </label>
 
                     <select
+                        id="transactionType"
                         value={transactionType}
                         onChange={handleTypeChange}
+                        required
+                        disabled={processing}
                     >
                         <option value="">Select Type</option>
 
@@ -67,18 +76,28 @@ function TransactionForm({
                 </div>
 
                 <div className="form-group">
-                    <label>Quantity</label>
+                    <label htmlFor="transactionQuantity">
+                        {isLibrarian ? "Quantity to Add" : "Quantity"}
+                    </label>
 
                     <input
+                        id="transactionQuantity"
                         type="number"
                         min="1"
-                        placeholder="Enter quantity"
-                        max={isLibrarian ? undefined : "1"}
+                        step="1"
+                        placeholder={
+                            isLibrarian
+                                ? "Enter quantity to add"
+                                : "1 book per transaction"
+                        }
+                        max={isLibrarian ? undefined : 1}
                         value={transactionQuantity}
                         onChange={e =>
                             setTransactionQuantity(e.target.value)
                         }
                         readOnly={!isLibrarian}
+                        required
+                        disabled={processing}
                     />
                 </div>
 
@@ -86,9 +105,25 @@ function TransactionForm({
                     <button
                         className="primary-btn"
                         type="submit"
-                        disabled={!transactionType}
+                        disabled={
+                            processing ||
+                            !transactionType ||
+                            !transactionBook ||
+                            (
+                                isLibrarian &&
+                                (
+                                    transactionQuantity === "" ||
+                                    !Number.isSafeInteger(
+                                        Number(transactionQuantity)
+                                    ) ||
+                                    Number(transactionQuantity) < 1
+                                )
+                            )
+                        }
                     >
-                        Process Transaction
+                        {processing
+                            ? "Processing..."
+                            : "Process Transaction"}
                     </button>
                 </div>
             </form>

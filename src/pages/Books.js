@@ -1,13 +1,23 @@
-import React from "react";
+import {
+    updateBook as updateBookAPI,
+    deleteBook as deleteBookAPI
+} from "../Api";
+
 import BookForm from "../components/Bookform";
 import BookList from "../components/BookList";
 
-function Books({ books, setBooks, transactions }) {
+function Books({ books, transactions, refreshData }) {
 
-    function updateBook(id) {
-        const book = books.find(item => item.id === id);
+    // Update an existing book.
+    async function updateBook(id) {
+        const book = books.find(
+            item => Number(item.id) === Number(id)
+        );
 
-        if (!book) return;
+        if (!book) {
+            alert("Book not found. Please refresh the page.");
+            return;
+        }
 
         const newTitle = prompt("Enter book title:", book.title);
         if (newTitle === null) return;
@@ -22,49 +32,107 @@ function Books({ books, setBooks, transactions }) {
         if (newISBN === null) return;
 
         if (
-            books.some(
-                item =>
-                    item.id !== id &&
-                    item.isbn.toLowerCase() ===
-                        newISBN.trim().toLowerCase()
-            )
+            !newTitle.trim() ||
+            !newAuthor.trim() ||
+            !newGenre.trim() ||
+            !newISBN.trim()
         ) {
+            alert("All fields are required.");
+            return;
+        }
+
+        // Check whether another book uses the same ISBN.
+        const duplicateISBN = books.some(
+            item =>
+                Number(item.id) !== Number(id) &&
+                String(item.isbn).trim().toLowerCase() ===
+                    newISBN.trim().toLowerCase()
+        );
+
+        if (duplicateISBN) {
             alert("Another book already uses this ISBN.");
             return;
         }
 
-        setBooks(
-            books.map(item =>
-                item.id === id
-                    ? {
-                          ...item,
-                          title: newTitle.trim(),
-                          author: newAuthor.trim(),
-                          genre: newGenre.trim(),
-                          isbn: newISBN.trim()
-                      }
-                    : item
-            )
-        );
+        try {
+            await updateBookAPI(id, {
+                title: newTitle.trim(),
+                author: newAuthor.trim(),
+                genre: newGenre.trim(),
+                isbn: newISBN.trim(),
+                quantity: Number(book.quantity)
+            });
+
+            const refreshed = await refreshData();
+
+            if (refreshed === false) {
+                alert(
+                    "The book was updated, but the latest data could not be loaded. Please refresh the page."
+                );
+                return;
+            }
+
+            alert("Book updated successfully.");
+        } catch (error) {
+            console.error("Update book error:", error);
+
+            alert(
+                error.message || "Unable to update the book."
+            );
+        }
     }
 
-    function deleteBook(id) {
-        const activeBorrow = transactions.some(
-            transaction =>
-                transaction.bookId === id &&
-                transaction.type === "borrow" &&
-                transaction.status === "Borrowed"
+    // Delete a book only if it has no transaction history.
+    async function deleteBook(id) {
+        const book = books.find(
+            item => Number(item.id) === Number(id)
         );
 
-        if (activeBorrow) {
+        if (!book) {
+            alert("Book not found. Please refresh the page.");
+            return;
+        }
+
+        // Check whether the book has any transaction history.
+        const hasTransactionHistory = transactions.some(
+            transaction =>
+                Number(transaction.bookId) === Number(id)
+        );
+
+        if (hasTransactionHistory) {
             alert(
-                "This book cannot be deleted because it is currently borrowed."
+                "This book cannot be deleted because it has transaction history. Keep the record to preserve the library's borrowing and stock history."
             );
             return;
         }
 
-        if (window.confirm("Are you sure you want to delete this book?")) {
-            setBooks(books.filter(book => book.id !== id));
+        if (
+            !window.confirm(
+                `Are you sure you want to delete "${book.title}"?`
+            )
+        ) {
+            return;
+        }
+
+        try {
+            await deleteBookAPI(id);
+
+            const refreshed = await refreshData();
+
+            if (refreshed === false) {
+                alert(
+                    "The book was deleted, but the latest data could not be loaded. Please refresh the page."
+                );
+                return;
+            }
+
+            alert("Book deleted successfully.");
+        } catch (error) {
+            console.error("Delete book error:", error);
+
+            alert(
+                error.message || "Unable to delete the book."
+            );
         }
     }
 
@@ -77,7 +145,7 @@ function Books({ books, setBooks, transactions }) {
 
             <BookForm
                 books={books}
-                setBooks={setBooks}
+                refreshData={refreshData}
             />
 
             <BookList

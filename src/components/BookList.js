@@ -1,6 +1,4 @@
-import React from "react";
-
-function BookList({ books, onUpdate, onDelete }) {
+function BookList({ books = [], onUpdate, onDelete }) {
     return (
         <div className="content-card">
             <h2>Book List</h2>
@@ -21,7 +19,11 @@ function BookList({ books, onUpdate, onDelete }) {
                     <tbody>
                         {books.length === 0 ? (
                             <tr>
-                                <td colSpan="6">
+                                <td
+                                    colSpan={6}
+                                    style={{ textAlign: "center" }}
+                                >
+                                    No books available.
                                 </td>
                             </tr>
                         ) : (
@@ -42,6 +44,7 @@ function BookList({ books, onUpdate, onDelete }) {
 
                                     <td>
                                         <button
+                                            type="button"
                                             className="update-btn"
                                             onClick={() =>
                                                 onUpdate(book.id)
@@ -51,6 +54,7 @@ function BookList({ books, onUpdate, onDelete }) {
                                         </button>
 
                                         <button
+                                            type="button"
                                             className="delete-btn"
                                             onClick={() =>
                                                 onDelete(book.id)

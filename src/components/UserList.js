@@ -1,4 +1,3 @@
-import React from "react";
 
 function UserList({
     users,
@@ -23,7 +22,10 @@ function UserList({
                     <tbody>
                         {users.length === 0 ? (
                             <tr>
-                                <td colSpan="4">
+                                <td
+                                    colSpan={4}
+                                    style={{ textAlign: "center" }}
+                                >
                                     No users found.
                                 </td>
                             </tr>
@@ -36,6 +38,7 @@ function UserList({
 
                                     <td>
                                         <button
+                                            type="button"
                                             className="update-btn"
                                             onClick={() =>
                                                 updateUser(user.id)
@@ -45,6 +48,7 @@ function UserList({
                                         </button>
 
                                         <button
+                                            type="button"
                                             className="delete-btn"
                                             onClick={() =>
                                                 deleteUser(user.id)

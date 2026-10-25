@@ -1,9 +1,6 @@
-import React from "react";
-
 function TransactionList({
     transactions,
-    isLibrarian,
-    onDelete
+    isLibrarian
 }) {
     return (
         <div className="content-card">
@@ -21,15 +18,17 @@ function TransactionList({
                             <th>Due Date</th>
                             <th>Returned</th>
                             <th>Status</th>
-
-                            {isLibrarian && <th>Action</th>}
                         </tr>
                     </thead>
 
                     <tbody>
                         {transactions.length === 0 ? (
                             <tr>
-                                <td colSpan={isLibrarian ? 9 : 8}>
+                                <td
+                                    colSpan={8}
+                                    style={{ textAlign: "center" }}
+                                >
+                                    No transactions recorded yet.
                                 </td>
                             </tr>
                         ) : (
@@ -42,33 +41,22 @@ function TransactionList({
                                             ? "Stock Added"
                                             : transaction.type === "borrow"
                                             ? "Borrow"
-                                            : "Return"}
+                                            : transaction.type === "return"
+                                            ? "Return"
+                                            : transaction.type}
                                     </td>
 
                                     <td>{transaction.quantity}</td>
 
                                     <td>{transaction.userName}</td>
 
-                                    <td>{transaction.date}</td>
+                                    <td>{transaction.date || "-"}</td>
 
-                                    <td>{transaction.dueDate}</td>
+                                    <td>{transaction.dueDate || "-"}</td>
 
-                                    <td>{transaction.returnedDate}</td>
+                                    <td>{transaction.returnedDate || "-"}</td>
 
                                     <td>{transaction.status}</td>
-
-                                    {isLibrarian && (
-                                        <td>
-                                            <button
-                                                className="delete-btn"
-                                                onClick={() =>
-                                                    onDelete(transaction.id)
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    )}
                                 </tr>
                             ))
                         )}

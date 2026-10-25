@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-function Login({ users, login }) {
+function Login({ login }) {
     const [membershipId, setMembershipId] = useState("");
     const [role, setRole] = useState("");
     const [message, setMessage] = useState("");
@@ -8,15 +8,17 @@ function Login({ users, login }) {
     function handleSubmit(e) {
         e.preventDefault();
 
-        if (!membershipId || !role) {
+        if (!membershipId.trim() || !role) {
             setMessage("Please enter your Membership ID and select a role.");
             return;
         }
 
-        const success = login(membershipId, role);
+        const success = login(membershipId.trim(), role);
 
         if (!success) {
             setMessage("Invalid Membership ID or role.");
+        } else {
+            setMessage("");
         }
     }
 
@@ -24,7 +26,6 @@ function Login({ users, login }) {
         <div className="login-screen">
             <div className="login-box">
                 <h1>Thabong Community Library</h1>
-                
 
                 <form onSubmit={handleSubmit}>
                     <label>Membership ID</label>
@@ -33,7 +34,6 @@ function Login({ users, login }) {
                         placeholder="Enter Membership ID"
                         value={membershipId}
                         onChange={(e) => setMembershipId(e.target.value)}
-                       
                     />
 
                     <label>Role</label>
@@ -46,9 +46,7 @@ function Login({ users, login }) {
                         <option value="User">User</option>
                     </select>
 
-                    <button  type="submit">
-                        Login
-                    </button>
+                    <button type="submit">Login</button>
                 </form>
 
                 {message && (

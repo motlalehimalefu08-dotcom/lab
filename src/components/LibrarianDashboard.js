@@ -1,17 +1,20 @@
 import React from "react";
 
-function LibrarianDashboard({ books, transactions }) {
+function LibrarianDashboard({
+    books = [],
+    transactions = [],
+    users = []
+}) {
+    // Calculate the total number of available copies.
     const totalBooks = books.reduce(
-        (total, book) => total + Number(book.quantity),
+        (total, book) => total + Number(book.quantity || 0),
         0
     );
 
+    // Find books with fewer than two copies.
     const lowStock = books.filter(
         book => Number(book.quantity) < 2
     );
-
-    const users =
-        JSON.parse(localStorage.getItem("users")) || [];
 
     return (
         <>
@@ -55,7 +58,12 @@ function LibrarianDashboard({ books, transactions }) {
                         <tbody>
                             {books.length === 0 ? (
                                 <tr>
-                                
+                                    <td
+                                        colSpan={5}
+                                        style={{ textAlign: "center" }}
+                                    >
+                                        No books available.
+                                    </td>
                                 </tr>
                             ) : (
                                 books.map(book => (

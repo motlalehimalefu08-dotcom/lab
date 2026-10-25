@@ -1,8 +1,7 @@
-import React from "react";
 import LibrarianDashboard from "../components/LibrarianDashboard";
 import MemberDashboard from "../components/MemberDashboard";
 
-function Dashboard({ books, transactions, loggedInUser }) {
+function Dashboard({ books, users, transactions, loggedInUser }) {
     const isLibrarian = loggedInUser.role === "Librarian";
 
     return (
@@ -15,6 +14,7 @@ function Dashboard({ books, transactions, loggedInUser }) {
             {isLibrarian ? (
                 <LibrarianDashboard
                     books={books}
+                    users={users}
                     transactions={transactions}
                 />
             ) : (
