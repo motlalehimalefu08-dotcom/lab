@@ -2,7 +2,7 @@
   "name": "myreact",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://motlalehimalefu08-dotcom.github.io/lab",
+  "homepage": ".",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
