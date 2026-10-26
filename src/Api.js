@@ -1,5 +1,5 @@
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://thabong-library-api.onrender.com/api";
 
 // Send requests to the backend and handle responses.
 async function request(endpoint, options = {}) {
@@ -15,7 +15,7 @@ async function request(endpoint, options = {}) {
         });
     } catch (error) {
         throw new Error(
-            "Cannot connect to the backend. Make sure the server is running on port 5000."
+            "Cannot connect to the library backend. Please try again later."
         );
     }
 
