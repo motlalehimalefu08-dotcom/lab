@@ -32,7 +32,7 @@ async function request(endpoint, options = {}) {
     return data;
 }
 
-// ==================== BOOK MANAGEMENT ====================
+//BOOK MANAGEMENT 
 
 // Get all books.
 export const getBooks = () => request("/books");
@@ -57,7 +57,7 @@ export const deleteBook = id =>
         method: "DELETE"
     });
 
-// ==================== USER MANAGEMENT ====================
+// USER MANAGEMENT
 
 // Get all users.
 export const getUsers = () => request("/users");
@@ -82,7 +82,7 @@ export const deleteUser = id =>
         method: "DELETE"
     });
 
-// ==================== TRANSACTION MANAGEMENT ====================
+// TRANSACTION MANAGEMENT 
 
 // Get all transactions.
 export const getTransactions = () =>
